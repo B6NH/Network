@@ -76,6 +76,33 @@
 // Internet services use different port numbers (IANA)
 // Ports under 1024 are special.
 
+// ------------------------------------------------------------------------
+
+// Different Byte Orders:
+// Big End First (Network Byte Order)
+// Little End First
+
+// Computer uses Host Byte Order (BE or LE)
+// Send data as NBO. After receiving value
+// convert it to HBO.
+
+// Host to Network:
+// Short - htons()
+// Long - htonl()
+
+// Network to Host:
+// Short - ntohs()
+// Long - ntohl()
+
+// ------------------------------------------------------------------------
+
+// Socket descriptor is integer.
+// Create struct addrinfo and call function gedaddrinfo().
+// It returns pointer to new linked list of addrinfo structures.
+
+// ai_family:
+//  IPv4 - AF_INET
+//  IPv6 - AF_INET6
 
 int main(){
   std::cout << "Network\n";

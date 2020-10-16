@@ -101,8 +101,59 @@
 // It returns pointer to new linked list of addrinfo structures.
 
 // ai_family:
-//  IPv4 - AF_INET
-//  IPv6 - AF_INET6
+// IPv4 - AF_INET
+// IPv6 - AF_INET6
+// Unspecified - AF_UNSPEC
+
+// Struct sockaddr can store data for different sockets:
+// sa_family (AF_XXX)
+// sa_data[14] (protocol address)
+
+// Struct sockaddr_in - IPv4.
+// Struct sockaddr_in6 - IPv6.
+// Struct sockaddr_storage - IPv4 and IPv6.
+
+// Convert IP addres from numbers and dots to sockaddr_in/sockaddr_in6 with
+// function inet_pton() (presentation to network).
+// Convert sockaddr_in/sockaddr_in6 to IP string with function inet_ntop().
+
+// Network Address Translation (NAT) is process of changing internal IP address
+// to its external representation. For example external address can be
+// 192.0.2.33 and internal 10.0.0.5. Addresses 10.X.X.X are reserved to be
+// used for disconnected networks or networks behind firewall.
+// Addresses 192.168.X.X and 172.Y.X.X are also used for this purpose.
+// Range: X(0-255), Y(16-31).
+
+// IPv6 private networks start with fdXX:.
+
+// ------------------------------------------------------------------------
+
+// Adapt to use IPv6.
+
+// Call getaddrinfo() to get sockaddr data. Change AF_INET to AF_INET6,
+// PF_INET to PF_INET6 and INADDR_ANY assignments to in6addr. Value
+// IN6ADDR_AN_INIT can be used as initializer for in6_addr structure.
+// Change sockaddr_in to sockaddr_in6 and in_addr to in6_addr.
+// Use inet_pton(), inet_ntop(), getaddrinfo() and getnameinfo() functions.
+
+// ------------------------------------------------------------------------
+
+// Function getaddrinfo() takes 3 parameters and returns pointer to linked
+// list of results (addrinfo structures). Parameters are:
+// node - host name or IP address
+// service - port number("80") or service name("http")
+// hints - addrinfo structure
+// res - result
+
+// Configure addrinfo hints (ai_family, ai_socktype, ai_flags) and call function
+// getaddrinfo(). It returns 0 if operation was successful. At the end free
+// list of structures with function freeaddrinfo().
+
+// ------------------------------------------------------------------------
+
+// socket()
+// ...
+
 
 int main(){
   std::cout << "Network\n";

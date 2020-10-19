@@ -151,8 +151,57 @@
 
 // ------------------------------------------------------------------------
 
-// socket()
-// ...
+// Function socket(domain, type, protocol) returns socket descriptor or -1.
+// Pass parameters from getaddrinfo():
+// - res->ai_family
+// - res->ai_socktype
+// - res->ai_protocol
+
+// Function bind(sockfd, my_addr, addrlen):
+// - file descriptor from socket() function
+// - pointer to sockaddr structure
+// - length of address
+
+// Function connect(sockfd, serv_addr, addrlen)
+// - file descriptor
+// - structure with destination port and address
+// - length of address structures
+
+// Function listen(sockfd, backlog)
+// - file descriptor
+// - number of allowed connections
+
+// Connections wait in queue until function accept() is called.
+
+// Order of functions:
+// getaddrinfo() -> socket() -> bind() -> listen()
+
+// Function accept(sockfd, addr, addrlen)
+// - listening socket descriptor
+// - pointer to sockaddr_storage
+// - sizeof struct sockaddr_storage
+
+// ------------------------------------------------------------------------
+
+// Function send(sockfd, msg, len, flags) returns number of bytes sent.
+// - socket descriptor
+// - pointer to data
+// - length of data
+// - 0
+
+// Function recv(sockfd, buf, len, flags) returns number of bytes read.
+// - socket descriptor
+// - data buffer
+// - maximum length of buffer
+// - 0
+
+// Functions sendto and recvfrom are used for connectionless datagram sockets.
+// Use function close() with socket descriptor to close connection.
+// Function shutdown() can control how sockets are closed.
+
+// Function getpeername() returns information about other side of stream socket.
+// Function gethostname() returns name of current computer that can be later
+// used by gethostbyname() to get IP address.
 
 
 int main(){

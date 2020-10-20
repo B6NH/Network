@@ -1,5 +1,3 @@
-#include <iostream>
-
 // Communicate with other programs using sockets and file descriptors.
 // File descriptor is integer associated with open file. Everything is file.
 // Method "socket()" returns file descriptor for network communication.
@@ -203,7 +201,55 @@
 // Function gethostname() returns name of current computer that can be later
 // used by gethostbyname() to get IP address.
 
+// ------------------------------------------------------------------------
+
+#include <iostream>
+#include <cassert>
+#include <cstring>
+
+#include <arpa/inet.h>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+
+using std::cout; using std::endl; using std::string;
 
 int main(){
-  std::cout << "Network\n";
+
+  // Byte order conversion
+  const short current = 15;
+  const short netshort = htons(current);
+  assert(ntohs(netshort)==current);
+
+  // IP to binary conversion
+  sockaddr_in sa; sockaddr_in6 sa6;
+  const char ip4address[] = "10.12.110.57";
+  const char ip6address[] = "2001:db8:63b3:1::3490";
+  inet_pton(AF_INET, ip4address, &(sa.sin_addr));
+  inet_pton(AF_INET6, ip6address, &(sa6.sin6_addr));
+
+  // Binary to string conversion
+  char ip4[INET_ADDRSTRLEN]; char ip6[INET6_ADDRSTRLEN];
+  inet_ntop(AF_INET, &(sa.sin_addr), ip4, INET_ADDRSTRLEN);
+  inet_ntop(AF_INET6, &(sa6.sin6_addr), ip6, INET6_ADDRSTRLEN);
+  assert(0==strcmp(ip4,ip4address)); assert(0==strcmp(ip6,ip6address));
+
+  // Use getaddrinfo(address|ip, service|port, hints, result)
+  int status; addrinfo hints; addrinfo * servinfo;
+
+  memset(&hints, 0, sizeof hints);
+  hints.ai_family = AF_UNSPEC;
+  hints.ai_socktype = SOCK_STREAM;
+  hints.ai_flags = AI_PASSIVE; // ip is NULL
+
+  // Results are addrinfo structures with pointers to sockaddr_in/sockaddr_in6.
+  if((status = getaddrinfo(NULL, "3490", &hints, &servinfo)) != 0){
+    fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+    exit(1);
+  }
+
+  // Free linked list of results through servinfo pointer
+  freeaddrinfo(servinfo);
+
 }

@@ -215,8 +215,17 @@
 
 using std::cout; using std::endl; using std::string;
 
-int main(){
+void one();
+void two();
 
+int main(){
+  one();
+  two();
+}
+
+
+
+void one(){
   // Byte order conversion
   const short current = 15;
   const short netshort = htons(current);
@@ -239,7 +248,7 @@ int main(){
   int status; addrinfo hints; addrinfo * servinfo;
 
   memset(&hints, 0, sizeof hints);
-  hints.ai_family = AF_UNSPEC;
+  hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
   hints.ai_socktype = SOCK_STREAM;
   hints.ai_flags = AI_PASSIVE; // ip is NULL
 
@@ -249,7 +258,60 @@ int main(){
     exit(1);
   }
 
+  int sockfd = socket(servinfo->ai_family,
+                      servinfo->ai_socktype,
+                      servinfo->ai_protocol);
+
+  int rr = bind(sockfd,servinfo->ai_addr, servinfo->ai_addrlen);
+  assert(0==rr);
+
   // Free linked list of results through servinfo pointer
   freeaddrinfo(servinfo);
 
+}
+
+void two(){
+
+  int status; addrinfo hints; addrinfo * res; addrinfo * p;
+
+  memset(&hints,0,sizeof hints);
+  hints.ai_family = AF_UNSPEC; // IPv4 or IPv6
+  hints.ai_socktype = SOCK_STREAM;
+  // Skip "hints.ai_flags = AI_PASSIVE" for specific address
+
+  if((status = getaddrinfo("www.example.com","3490",&hints,&res)) != 0){
+    fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+    return;
+  }
+
+  char ipstr[INET6_ADDRSTRLEN];
+
+  cout << "IP addresses for www.example.com:\n";
+
+  for(p=res; p!=NULL; p=p->ai_next){
+    void * addr; char ipver[5];
+
+    if(p->ai_family == AF_INET){
+      sockaddr_in * ipv4 = (sockaddr_in *)p->ai_addr;
+      addr = &(ipv4->sin_addr);
+      strcpy(ipver,"IPv4");
+    }else{
+      sockaddr_in6 * ipv6 = (sockaddr_in6 *)p->ai_addr;
+      addr = &(ipv6->sin6_addr);
+      strcpy(ipver,"IPv6");
+    }
+
+    // Convert binary IP to string
+    inet_ntop(p->ai_family,addr,ipstr, sizeof ipstr);
+    cout << ipver << ": " << ipstr << endl;
+
+  }
+
+  // Return socket descriptor
+  int s;
+  s = socket(res->ai_family,res->ai_socktype,res->ai_protocol);
+
+  //connect(s,res->ai_addr,res->ai_addrlen);
+
+  freeaddrinfo(res);
 }

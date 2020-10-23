@@ -212,6 +212,7 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <unistd.h> // close(), gethostbyname()
 
 using std::cout; using std::endl; using std::string;
 
@@ -226,6 +227,14 @@ int main(){
 
 
 void one(){
+
+  cout << "One\n";
+
+  // Display host name
+  char hostname[20];
+  gethostname(hostname,sizeof(hostname));
+  cout << "Host name: " << hostname << endl;
+
   // Byte order conversion
   const short current = 15;
   const short netshort = htons(current);
@@ -265,12 +274,26 @@ void one(){
   int rr = bind(sockfd,servinfo->ai_addr, servinfo->ai_addrlen);
   assert(0==rr);
 
+  listen(sockfd,10);
+
+  close(sockfd);
+
+  sockaddr_storage their_addr;
+  socklen_t addr_size = sizeof their_addr;
+
+  // Call accept(descriptor, storage, sizeof sockaddr_storage).
+  // Return new file descriptor.
+  //int new_fd = accept(sockfd,(sockaddr *)&their_addr,&addr_size);
+
   // Free linked list of results through servinfo pointer
   freeaddrinfo(servinfo);
 
+  cout << "End One\n";
 }
 
 void two(){
+
+  cout << "Two\n";
 
   int status; addrinfo hints; addrinfo * res; addrinfo * p;
 
@@ -279,14 +302,14 @@ void two(){
   hints.ai_socktype = SOCK_STREAM;
   // Skip "hints.ai_flags = AI_PASSIVE" for specific address
 
-  if((status = getaddrinfo("www.example.com","3490",&hints,&res)) != 0){
+  if((status = getaddrinfo("example.com","3490",&hints,&res)) != 0){
     fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
     return;
   }
 
   char ipstr[INET6_ADDRSTRLEN];
 
-  cout << "IP addresses for www.example.com:\n";
+  cout << "IP addresses for example.com:\n";
 
   for(p=res; p!=NULL; p=p->ai_next){
     void * addr; char ipver[5];
@@ -311,7 +334,22 @@ void two(){
   int s;
   s = socket(res->ai_family,res->ai_socktype,res->ai_protocol);
 
-  //connect(s,res->ai_addr,res->ai_addrlen);
+  sockaddr_in peer; unsigned int peer_len = sizeof(peer);
+  getpeername(s,(sockaddr *)&peer,&peer_len);
+
+  cout << "Peer IP address is: " << inet_ntoa(peer.sin_addr) << endl;
+  cout << "Peer's port is: " << peer.sin_port << endl;
+
+  // connect(s,(sockaddr *)res->ai_addr,res->ai_addrlen);
+
+  //close(s);
+
+  // const char * msg { "Test message" };
+  // int len = strlen(msg);
+  //
+  // int bytes = send(s,msg,len,0);
 
   freeaddrinfo(res);
+
+  cout << "End Two\n";
 }

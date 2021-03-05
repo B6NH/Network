@@ -203,6 +203,13 @@
 
 // ------------------------------------------------------------------------
 
+// Client-Server Background, Stream Server, Stream Client, Datagram Sockets
+// Slightly Advanced Techniques, Blocking, poll(), select(), partial send()
+// Serialization, Data Encapsulation, Broadcast Packets
+// Common Questions, Man Pages, More References
+
+// ------------------------------------------------------------------------
+
 #include <iostream>
 #include <cassert>
 #include <cstring>
